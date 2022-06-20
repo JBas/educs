@@ -1,4 +1,4 @@
-from cspy import *
+from educs import *
 
 num = 2000
 r = 6

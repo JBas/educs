@@ -1,4 +1,4 @@
-from cspy import *
+from educs import *
 
 w = None
 columns = None
