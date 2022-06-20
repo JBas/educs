@@ -9,6 +9,8 @@
       pkgs.zlib
       # Needed for pygame
       pkgs.glib
+      # Needed for opencv
+      pkgs.libGL
     ] ++ (with pkgs.xlibs; [ libX11 libXext libXinerama libXcursor libXrandr libXi libXxf86vm ]));
 
     PYTHONBIN = "${pkgs.python38Full}/bin/python3.8";

@@ -2,8 +2,11 @@ import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
 import pygame
+import numpy as np
+import cv2 as cv
 import math
-# from lib.pygame_class_wrapper import EventManager
+
+from cspy.color import _input2Color
 
 class EventManager:
     def __init__(self):
@@ -33,55 +36,12 @@ width = 200
 height = 200
 settings_stack = []
 settings = {
-    "fill_color": "white",
+    "fill_color": _input2Color("white"),
     "no_fill": False,
     "stroke_weight": 1,
-    "stroke_color": "black",
+    "stroke_color": _input2Color("black"),
     "rotate_amnt": 0
 }
-
-# COLOR
-def color(r, g, b):
-    return pygame.Color(r, g, b)
-
-def alpha(c):
-    return c.a
-
-def red(c):
-    return c.r
-
-def green(c):
-    return c.g
-
-def blue(c):
-    return c.b
-
-def brightness(c):
-    return c.hsva[2]
-
-def hue(c):
-    return c.hsva[0]
-
-def lightness(c):
-    return c.hsla[2]
-
-def saturation(c):
-    return c.hsla[1]
-
-def lerpColor(c1, c2, amnt):
-    return c1.lerp(c2, amnt) 
-
-# CONSTANTS
-HALF_PI = math.pi/2.0
-PI = math.pi
-QUARTER_PI = math.pi/4.0
-TAU = math.tau
-
-CURSOR_ARROW = pygame.cursors.arrow
-CURSOR_DIAMOND = pygame.cursors.diamond
-CURSOR_BROKEN_X = pygame.cursors.broken_x
-CURSOR_TRI_LEFT = pygame.cursors.tri_left
-CURSOR_TRI_RIGHT = pygame.cursors.tri_right
 
 # IMAGE
 def loadImage(path):
@@ -114,7 +74,31 @@ def getMouseX():
 def getMouseY():
     return mouseY
 
-# SHAPE  
+# SHAPE
+def _filledArc(r, start, stop):
+    arc_image = np.zeros((r.height, r.width, 3), dtype = np.uint8)
+    cf = settings["fill_color"]
+    cv.ellipse(arc_image, r.center, (r.height, r.width), 0, math.degrees(start), math.degrees(stop), 0)
+
+    img = pygame.image.frombuffer(arc_image, r.size, "RGB")
+    print("hello")
+    screen.blit(img, img.get_rect(center=r.center))
+    return
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
 def _filledShape(func, *args, **kwargs):
     if (not settings["no_fill"]):
         func(screen, settings["fill_color"], *args, **kwargs, width=0)
@@ -125,7 +109,7 @@ def _filledShape(func, *args, **kwargs):
     
 def arc(x, y, w, h, start, stop):
     r = pygame.Rect(x-w/2, y-h/2, w, h)
-    _filledShape(pygame.draw.arc, r, start, stop)
+    _filledArc(r, start, stop)
     pass
 
 def ellipse(x, y, w, h):
@@ -183,12 +167,12 @@ def createCanvas(w=100, h=100):
     pass
 
 def background(c):
-    a = input2Color(c)
+    a = _input2Color(c)
     screen.fill(a)
     pass
 
 def fill(c):
-    settings["fill_color"] = input2Color(c)
+    settings["fill_color"] = _input2Color(c)
     settings["no_fill"] = False
     pass
 
@@ -197,7 +181,7 @@ def noFill():
     pass
 
 def stroke(c):
-    settings["stroke_color"] = input2Color(c)
+    settings["stroke_color"] = _input2Color(c)
     pass
 
 def strokeWeight(weight):
@@ -207,8 +191,8 @@ def strokeWeight(weight):
         settings["stroke_weight"] = weight
     pass
 
-def noStroke(c):
-    settings["stroke_color"] = "black"
+def noStroke():
+    settings["stroke_weight"] = -1
     pass
 
 # STRUCTURE
@@ -285,9 +269,3 @@ def mouseDragged(func):
 
 def isMousedPressed():
     return not mouseUp
-
-def input2Color(c):
-    if (type(c) == int) and (0 <= c) and (255 >= c):
-        return pygame.Color(c, c, c)
-    elif (type(c) == str):
-        return pygame.Color(c)
