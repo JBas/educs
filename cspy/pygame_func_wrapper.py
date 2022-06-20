@@ -5,6 +5,7 @@ import pygame
 import numpy as np
 import cv2 as cv
 import math
+import random as randompy
 
 from cspy.color import _input2Color
 
@@ -34,6 +35,7 @@ mouseY = None
 mouseUp = True
 width = 200
 height = 200
+framerate = 60
 settings_stack = []
 settings = {
     "fill_color": _input2Color("white"),
@@ -122,7 +124,7 @@ def circle(x, y, d):
     pass
 
 def line(x1, y1, x2, y2):
-    _filledShape(pygame.draw.line, (x1, y1), (x2, y2))
+    pygame.draw.line(screen, settings["stroke_color"], (x1, y1), (x2, y2), width=1)
     pass
 
 def point(x, y):
@@ -207,6 +209,28 @@ def pop():
     settings = settings_stack.pop()
     pass
 
+def frameRate(f):
+    global framerate
+    framerate = f
+
+def random(min=0, max=10):
+    return randompy.randrange(min, max)
+
+def constrain(num, low, high):
+    if num <= high and num >= low:
+        return num
+    elif num < low:
+        return low
+    elif num > high:
+        return high
+    return -1
+
+def floor(x):
+    return math.floor(x)
+
+def ceil(x):
+    return math.ceil(x)
+
 def setup(func):
 
     def wrapper_setup():
@@ -246,7 +270,7 @@ def draw(func):
             func()
             
             pygame.display.flip()
-            clock.tick(60)
+            clock.tick(framerate)
     return wrapper_draw
 
 def keyPressed(func):

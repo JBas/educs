@@ -18,12 +18,12 @@ def setup():
     # Wacky way to make a 2D array in Python
     board = []
     for i in range(columns):
-        board.append([None for j in range(rows)])
+        board[i] = [None for j in range(rows)]
     
     # Going to use multiple 2D arrays and swap them
     next = []
     for i in range(columns):
-        next.append([None for j in range(rows)])
+        next[i] = [None for j in range(rows)]
     init()
 
 @draw
