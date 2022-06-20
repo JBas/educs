@@ -3,11 +3,11 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
 import pygame
 import numpy as np
-import cv2 as cv
+# import cv2 as cv
 import math
 import random as randompy
 
-from cspy.color import _input2Color
+from educs.color import _input2Color
 
 class EventManager:
     def __init__(self):
@@ -78,14 +78,15 @@ def getMouseY():
 
 # SHAPE
 def _filledArc(r, start, stop):
-    arc_image = np.zeros((r.height, r.width, 3), dtype = np.uint8)
-    cf = settings["fill_color"]
-    cv.ellipse(arc_image, r.center, (r.height, r.width), 0, math.degrees(start), math.degrees(stop), 0)
+    # arc_image = np.zeros((r.height, r.width, 3), dtype = np.uint8)
+    # cf = settings["fill_color"]
+    # cv.ellipse(arc_image, r.center, (r.height, r.width), 0, math.degrees(start), math.degrees(stop), 0)
 
-    img = pygame.image.frombuffer(arc_image, r.size, "RGB")
-    print("hello")
-    screen.blit(img, img.get_rect(center=r.center))
-    return
+    # img = pygame.image.frombuffer(arc_image, r.size, "RGB")
+    # print("hello")
+    # screen.blit(img, img.get_rect(center=r.center))
+    # return
+    pass
 
 
 

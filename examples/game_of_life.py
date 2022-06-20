@@ -18,16 +18,18 @@ def setup():
     # Wacky way to make a 2D array in Python
     board = []
     for i in range(columns):
-        board[i] = [None for j in range(rows)]
+        board.append([None for j in range(rows)])
     
     # Going to use multiple 2D arrays and swap them
     next = []
     for i in range(columns):
-        next[i] = [None for j in range(rows)]
+        next.append([None for j in range(rows)])
     init()
 
 @draw
 def draw():
+    global board
+    
     background(255)
     generate();
     for i in range(columns):
@@ -41,21 +43,20 @@ def draw():
 
 # reset board when mouse is pressed
 @mouseClicked
-def onMouseClicked():
+def onMouseClicked(event):
     init()
 
 @mouseDragged
-def onMouseDragged():
+def onMouseDragged(event):
     pass
 
 @keyPressed
-def onKeyPressed():
+def onKeyPressed(event):
     pass
 
 # Fill board randomly
 def init():
-    global board
-    global next
+    global board, next, columns, rows
     for i in range(columns):
         for j in range(rows):
             # Lining the edges with 0s
@@ -63,13 +64,12 @@ def init():
                 board[i][j] = 0
             # Filling the rest randomly
             else:
-                board[i][j] = floor(random(2));
+                board[i][j] = floor(random(0, 2));
             next[i][j] = 0
 
 # The process of creating the new generation
 def generate():
-    global board
-    global next
+    global board, next, columns, rows
     # Loop through every spot in our 2D array and check spots neighbors
     for x in range(1, columns-1):
         for y in range(1, rows-1):
