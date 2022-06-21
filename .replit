@@ -1,6 +1,6 @@
 run = ["python3", "main.py"]
 language = "python3"
-entrypoint = "examples/brownian_motion.py"
+entrypoint = "examples/recursion.py"
 hidden = ["venv", ".config", "**/__pycache__", "**/.mypy_cache", "**/*.pyc"]
 
 audio = true

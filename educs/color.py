@@ -1,14 +1,22 @@
 from pygame import Color
 
-def _input2Color(c):
+def _input2Color(c, a=255):
     if (type(c) == int) and (0 <= c) and (255 >= c):
-        return Color(c, c, c)
+        color = Color(c, c, c)
+        color.a = a
+        return color
     elif (type(c) == float) and (0 <= c) and (255 >= c):
-        return Color(int(c), int(c), int(c))
+        color = Color(int(c), int(c), int(c), a)
+        color.a = a
+        return color
     elif (type(c) == str):
-        return Color(c)
+        color = Color(c)
+        color.a = a
+        return color
     elif (type(c) == tuple):
-        return Color(c)
+        color = Color(c)
+        color.a = a
+        return color
 
 # COLOR
 def color(r, g, b):

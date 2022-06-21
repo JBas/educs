@@ -87,21 +87,7 @@ def _filledArc(r, start, stop):
     # screen.blit(img, img.get_rect(center=r.center))
     # return
     pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
+  
 def _filledShape(func, *args, **kwargs):
     if (not settings["no_fill"]):
         func(screen, settings["fill_color"], *args, **kwargs, width=0)
@@ -169,9 +155,9 @@ def createCanvas(w=100, h=100):
     screen = pygame.display.set_mode((w, h), pygame.NOFRAME)
     pass
 
-def background(c):
-    a = _input2Color(c)
-    screen.fill(a)
+def background(c, a=255):
+    x = _input2Color(c)
+    screen.fill(x)
     pass
 
 def fill(c):
@@ -232,6 +218,7 @@ def setup(func):
         clock = pygame.time.Clock()
         
     return wrapper_setup
+    
 
 def draw(func):
     
@@ -243,9 +230,10 @@ def draw(func):
         global mouseUp
         global doLoop
 
-        
+        cntLoop = 0
+
         while True:
-            while doLoop:
+            while doLoop or cntLoop == 0:
                 events = pygame.event.get()
                 for event in events:
                     if event.type == pygame.KEYDOWN:
@@ -263,6 +251,7 @@ def draw(func):
                 func()
                 
                 pygame.display.flip()
+                cntLoop = 1
                 clock.tick(framerate)
     return wrapper_draw
 
