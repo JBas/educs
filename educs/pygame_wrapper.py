@@ -5,7 +5,6 @@ import pygame
 import numpy as np
 # import cv2 as cv
 import math
-import random as randompy
 
 from educs.color import _input2Color
 
@@ -29,6 +28,7 @@ class Image(pygame.Surface):
 # "private" variables
 screen = None
 clock = None
+doLoop = True
 eventManager = EventManager()
 mouseX = None
 mouseY = None
@@ -214,23 +214,13 @@ def frameRate(f):
     global framerate
     framerate = f
 
-def random(min=0, max=10):
-    return randompy.randrange(min, max)
+def loop():
+    global doLoop
+    doLoop = True
 
-def constrain(num, low, high):
-    if num <= high and num >= low:
-        return num
-    elif num < low:
-        return low
-    elif num > high:
-        return high
-    return -1
-
-def floor(x):
-    return math.floor(x)
-
-def ceil(x):
-    return math.ceil(x)
+def noLoop():
+    global doLoop
+    doLoop = False
 
 def setup(func):
 
@@ -251,27 +241,29 @@ def draw(func):
         global mouseX
         global mouseY
         global mouseUp
+        global doLoop
 
         
         while True:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    eventManager.keyPressed(event)
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    mouseUp = True
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    mouseUp = False
-                    eventManager.mouseClicked(event)
-                elif event.type == pygame.MOUSEMOTION:
-                    if (not mouseUp):
-                        eventManager.mouseDragged(event)
-            mouseX, mouseY = pygame.mouse.get_pos()
-            
-            func()
-            
-            pygame.display.flip()
-            clock.tick(framerate)
+            while doLoop:
+                events = pygame.event.get()
+                for event in events:
+                    if event.type == pygame.KEYDOWN:
+                        eventManager.keyPressed(event)
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        mouseUp = True
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        mouseUp = False
+                        eventManager.mouseClicked(event)
+                    elif event.type == pygame.MOUSEMOTION:
+                        if (not mouseUp):
+                            eventManager.mouseDragged(event)
+                mouseX, mouseY = pygame.mouse.get_pos()
+                
+                func()
+                
+                pygame.display.flip()
+                clock.tick(framerate)
     return wrapper_draw
 
 def keyPressed(func):
