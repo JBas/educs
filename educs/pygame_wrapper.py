@@ -48,7 +48,8 @@ def loadImage(path):
     return pygame.image.load(path)
 
 def image(img, x, y):
-    backgroundSurf.blit(img, (x, y))
+    if (backgroundSurf):
+        backgroundSurf.blit(img, (x, y))
 
 # DATA
 
@@ -87,11 +88,12 @@ def _filledArc(r, start, stop):
     pass
   
 def _filledShape(func, *args, **kwargs):
-    if (not settings["no_fill"]):
-        func(backgroundSurf, settings["fill_color"], *args, **kwargs, width=0)
-
-    if (settings["stroke_weight"] > 0):
-        func(backgroundSurf, settings["stroke_color"], *args, **kwargs, width=settings["stroke_weight"])
+    if (backgroundSurf):
+        if (not settings["no_fill"]):
+            func(backgroundSurf, settings["fill_color"], *args, **kwargs, width=0)
+    
+        if (settings["stroke_weight"] > 0):
+            func(backgroundSurf, settings["stroke_color"], *args, **kwargs, width=settings["stroke_weight"])
     return
     
 def arc(x, y, w, h, start, stop):
@@ -112,7 +114,8 @@ def circle(x, y, d):
     pass
 
 def line(x1, y1, x2, y2):
-    pygame.draw.line(backgroundSurf, settings["stroke_color"], (x1, y1), (x2, y2), width=1)
+    if (backgroundSurf):
+        pygame.draw.line(backgroundSurf, settings["stroke_color"], (x1, y1), (x2, y2), width=1)
     pass
 
 def point(x, y):
@@ -160,62 +163,72 @@ def createCanvas(w=100, h=100):
 
 @dispatch(tuple)
 def background(c):
-    x = _input2Color(c)
-    backgroundSurf.fill(x)
+    if (backgroundSurf):
+        x = _input2Color(c)
+        backgroundSurf.fill(x)
     pass
 
 @dispatch(tuple, int)
 def background(c, a):
-    x = _input2Color(c, a)
-    backgroundSurf.fill(x)
+    if (backgroundSurf):
+        x = _input2Color(c, a)
+        backgroundSurf.fill(x)
     pass
     
 @dispatch(int)
 def background(c):
-    x = _input2Color(c)
-    backgroundSurf.fill(x)
+    if (backgroundSurf):
+        x = _input2Color(c)
+        backgroundSurf.fill(x)
     pass
 
 @dispatch(int, int)
 def background(c, a):
-    x = _input2Color(c, a)
-    backgroundSurf.fill(x)
+    if (backgroundSurf):
+        x = _input2Color(c, a)
+        backgroundSurf.fill(x)
     pass
 
 @dispatch(str)
 def background(c):
-    x = _input2Color(c)
-    backgroundSurf.fill(x)
+    if (backgroundSurf):
+        x = _input2Color(c)
+        backgroundSurf.fill(x)
     pass
 
 @dispatch(str, int)
 def background(c, a):
-    x = _input2Color(c, a)
-    backgroundSurf.fill(x)
+    if (backgroundSurf):
+        x = _input2Color(c, a)
+        backgroundSurf.fill(x)
     pass
 
 @dispatch(float)
 def background(c):
-    x = _input2Color(c)
-    backgroundSurf.fill(x)
+    if (backgroundSurf):
+        x = _input2Color(c)
+        backgroundSurf.fill(x)
     pass
 
 @dispatch(float, int)
 def background(c, a):
-    x = _input2Color(c, a)
-    backgroundSurf.fill(x)
+    if (backgroundSurf):
+        x = _input2Color(c, a)
+        backgroundSurf.fill(x)
     pass
 
 @dispatch(int, int, int)
 def background(r, g, b):
-    x = _input2Color((r, g, b))
-    backgroundSurf.fill(x)
+    if (backgroundSurf):
+        x = _input2Color((r, g, b))
+        backgroundSurf.fill(x)
     pass
 
 @dispatch(int, int, int, int)
 def background(r, g, b, a):
-    x = _input2Color((r, g, b), a)
-    backgroundSurf.fill(x)
+    if (backgroundSurf):
+        x = _input2Color((r, g, b), a)
+        backgroundSurf.fill(x)
     pass
 
 @dispatch(int)
@@ -347,7 +360,7 @@ def draw(func):
         cntLoop = 0
 
         while True:
-            while doLoop or cntLoop == 0:
+            while (doLoop or cntLoop == 0):
                 
                 events = pygame.event.get()
                 for event in events:
@@ -365,9 +378,10 @@ def draw(func):
                 
                 func()
 
-                windowSurf.blit(backgroundSurf, (0, 0))
-                
-                pygame.display.flip()
+                if (windowSurf and backgroundSurf):
+                    windowSurf.blit(backgroundSurf, (0, 0))
+                    pygame.display.flip()
+                    
                 cntLoop = 1
                 clock.tick(framerate)
     return wrapper_draw
