@@ -10,6 +10,8 @@ def _input2Color(c, a=255):
         color = Color(c)
     elif (type(c) == tuple):
         color = Color(c)
+    else:
+        color = Color("black")
     color.a = a
     return color
 
