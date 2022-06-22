@@ -46,8 +46,12 @@ def logb(x, b):
 def mag(x, y):
     return math.dist((0, 0), (x, y))
 
-def rerange(value, start1, stop1, start2, stop2):
-    return (stop2 - start2)*value / (stop1 - start1) + start2
+def rerange(value, start1, stop1, start2, stop2, clamp=False):
+    n = (stop2 - start2)*value / (stop1 - start1) + start2
+    if clamp:
+        return constrain(n, start2, stop2)
+    else:
+        return n
 
 def norm(value, start, stop):
     return rererange(value, start, stop, 0, 1)
