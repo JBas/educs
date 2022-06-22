@@ -1,10 +1,6 @@
-import os
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-
 import pygame
 import numpy as np
 from multipledispatch import dispatch
-# import cv2 as cv
 import math
 
 from educs.color import _input2Color

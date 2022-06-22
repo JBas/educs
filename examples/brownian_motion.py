@@ -53,10 +53,13 @@ def draw():
         line(ax[j - 1], ay[j - 1], ax[j], ay[j])
     pass
 
-
-if __name__=="__main__":
+def main():
     onMouseDragged(None) # registers your onMouseDragged function
     onKeyPressed(None) # registers your onKeyPress function
     onMouseClicked(None) # registers your onMouseClick function
     setup() # sets up the window
-    draw() # starts running your draw function 60 times a second
+    draw() # starts running your draw function
+           # framerate (default is 60) times a second
+    
+if __name__=="__main__":
+    main()
