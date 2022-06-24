@@ -10,9 +10,9 @@ from educs.color import (color, alpha, background,
 
 from educs.constants import (TWO_PI, HALF_PI, PI, QUARTER_PI, TAU, CURSOR_ARROW, CURSOR_DIAMOND, CURSOR_BROKEN_X, CURSOR_TRI_LEFT, CURSOR_TRI_RIGHT)
 
-from educs.math import (random, constrain, floor, ceil, dist, exp, lerp, ln, log10, log2, logb, mag, rerange, norm, sq, sqrt, frac, sin, cos, tan, asin, acos, atan, atan2, degrees, radians)
+from educs.math import (random, constrain, floor, ceil, dist, exp, lerp, ln, log10, log2, logb, mag, rerange, norm, sq, sqrt, frac, sin, cos, tan, asin, acos, atan, atan2, degrees, radians, integral)
 
-__all__ = ["setup", "draw", "createCanvas", "background", "fill", "noFill", "line", "ellipse", "circle", "rect", "triangle", "quad", "arc", "push", "pop", "getMouseX", "getMouseY", "getWidth", "getHeight", "cursor", "TWO_PI", "HALF_PI", "PI", "QUARTER_PI", "TAU", "CURSOR_ARROW", "CURSOR_DIAMOND", "CURSOR_BROKEN_X", "CURSOR_TRI_LEFT", "CURSOR_TRI_RIGHT", "strokeWeight", "stroke", "noStroke", "loadImage", "image", "keyPressed", "mouseClicked", "mouseDragged", "isMousedPressed", "Image", "frameRate", "random", "constrain", "floor", "ceil", "dist", "exp", "lerp", "ln", "log10", "log2", "logb", "mag", "rerange", "norm", "sq", "sqrt", "frac", "sin", "cos", "tan", "asin", "acos", "atan", "atan2", "degrees", "radians", "loop", "noLoop"]
+__all__ = ["setup", "draw", "createCanvas", "background", "fill", "noFill", "line", "ellipse", "circle", "rect", "triangle", "quad", "arc", "push", "pop", "getMouseX", "getMouseY", "getWidth", "getHeight", "cursor", "TWO_PI", "HALF_PI", "PI", "QUARTER_PI", "TAU", "CURSOR_ARROW", "CURSOR_DIAMOND", "CURSOR_BROKEN_X", "CURSOR_TRI_LEFT", "CURSOR_TRI_RIGHT", "strokeWeight", "stroke", "noStroke", "loadImage", "image", "keyPressed", "mouseClicked", "mouseDragged", "isMousedPressed", "Image", "frameRate", "random", "constrain", "floor", "ceil", "dist", "exp", "lerp", "ln", "log10", "log2", "logb", "mag", "rerange", "norm", "sq", "sqrt", "frac", "sin", "cos", "tan", "asin", "acos", "atan", "atan2", "degrees", "radians", "loop", "noLoop", "integral"]
 
 __version__ = "0.0.4"
 

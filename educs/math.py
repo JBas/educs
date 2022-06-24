@@ -91,3 +91,35 @@ def degrees(x):
 
 def radians(x):
     return math.radians(x)
+
+def integral(f, a, b, n, type="midpoint"):
+    if type == "midpoint":
+        return _midpoint(f, a, b, n)
+    elif type == "trapezoid":
+        return _trapezoid(f, a, b, n)
+    elif type == "simpsons":
+        return _simpsons(f, a, b, n)
+    else:
+        return -1
+    pass
+
+def _midpoint(f, a, b, n):
+    dx = (b-a)/n
+    result = 0
+
+    xi = linspace(a + 0.5*dx, b - 0.5*dx, n)
+    result = dx*sum(f(xi))
+    return result
+
+def _trapezoid(f, a, b, n):
+    dx = (b-a)/n
+    result = 0
+
+    xi = linspace(a, b, n+1)
+    result = sum(f(xi)) - 0.5*f(a) - 0.5*f(b)
+    return result*dx
+
+def _simpsons(f, a, b, n):
+    if n % 2:
+        return -1
+    return (b-a)/6.0 * (f(a) + 4*f((a+b)/2) + f(b))
