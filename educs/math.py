@@ -92,7 +92,7 @@ def degrees(x):
 def radians(x):
     return math.radians(x)
 
-def integral(f, a, b, n, type="midpoint"):
+def integral(f, a, b, n=100, type="midpoint"):
     if type == "midpoint":
         return _midpoint(f, a, b, n)
     elif type == "trapezoid":
