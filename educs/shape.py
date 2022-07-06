@@ -1,5 +1,4 @@
 from __future__ import annotations
-from turtle import color
 from pyglet import shapes
 from educs.pyglet_wrapper import State
 
@@ -24,6 +23,15 @@ def movePos(obj, position: tuple = None):
             obj.position = position
         except:
             print(f"This object {obj} has no member position!")
+
+
+
+
+
+class BorderableShape(shapes._ShapeBase):
+
+    def __init__(self, *args, **kwargs):
+        pass
 
 
 def circle(x: float, y: float, d: float) -> shapes.Circle :

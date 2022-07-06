@@ -9,6 +9,7 @@ class State:
     width: int = 0
     height: int = 0
     framerate: float = 60.0
+    framecount: int = 0
     batch: pyglet.graphics.Batch = pyglet.graphics.Batch()
     batch_list = []
     window: pyglet.window.Window = pyglet.window.Window(resizable=True)
@@ -44,6 +45,8 @@ def draw(func: function) -> function:
 
     def wrapper_draw(dt):
         func()
+
+        State.framecount += 1
         return
 
     pyglet.clock.schedule_interval(wrapper_draw, 1 / State.framerate)

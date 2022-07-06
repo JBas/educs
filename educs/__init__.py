@@ -6,6 +6,8 @@ from educs.render import createCanvas
 from educs.shape import (moveX, moveY, movePos)
 from educs.shape import (circle, point)
 
+from educs.environment import (frameRate, frameCount)
+
 # from educs.color import (color, alpha, background,
 #                          fill, noFill,
 #                          red, green, blue, brightness,
