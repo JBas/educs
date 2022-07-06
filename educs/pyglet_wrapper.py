@@ -12,7 +12,7 @@ class State:
     framecount: int = 0
     batch: pyglet.graphics.Batch = pyglet.graphics.Batch()
     batch_list = []
-    window: pyglet.window.Window = pyglet.window.Window(resizable=True)
+    window: pyglet.window.Window = None
     settings_stack = []
     settings = {
         "fill_color": (255, 0, 255),
