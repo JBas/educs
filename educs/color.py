@@ -1,4 +1,5 @@
 from __future__ import annotations
+from pyglet.gl.gl import glClearColor, GLfloat
 
 class Color:
 
@@ -106,6 +107,15 @@ def red(color: Color) -> int:
 
 def saturation(color: Color) -> float:
     return color.saturation()
+
+def background(color: tuple|Color) -> None:
+
+    # https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glClearColor.xhtml
+    r: GLfloat = color[0] / 255
+    g: GLfloat = color[1] / 255
+    b: GLfloat = color[2] / 255
+    glClearColor(r, g, b, 1.0)
+    return
 
 if __name__=="__main__":
     color_tuple = Color((255, 255, 255))
