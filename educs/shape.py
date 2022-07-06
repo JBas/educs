@@ -1,6 +1,29 @@
 from __future__ import annotations
+from turtle import color
 from pyglet import shapes
-from educs.pyglet_wrapper import  settings
+from educs.pyglet_wrapper import State
+
+
+def moveX(obj, x: int = None):
+    if obj and x:
+        try:
+            obj.x = x
+        except:
+            print(f"This object {obj} has no member x!")
+
+def moveY(obj, y: int = None):
+    if obj and y:
+        try:
+            obj.y = y
+        except:
+            print(f"This object {obj} has no member y!")
+
+def movePos(obj, position: tuple = None):
+    if obj and position:
+        try:
+            obj.position = position
+        except:
+            print(f"This object {obj} has no member position!")
 
 # def _filledArc(r, start, stop):
 #     # arc_image = np.zeros((r.height, r.width, 3), dtype = np.uint8)
@@ -28,10 +51,10 @@ from educs.pyglet_wrapper import  settings
 #     _filledShape(pygame.draw.ellipse, r)
 #     pass
 
-def circle(x: float, y: float, d: float):
-    shape = shapes.Circle(x, y, d/2, color=(255, 255, 255), batch=None)
-    # batch_list.append(shape)
-    pass
+def circle(x: float, y: float, d: float) -> shapes.Circle :
+    shape = shapes.Circle(x, y, d/2, color=(255, 255, 255), batch=State.batch)
+    State.batch_list.append(shape)
+    return shape
 
 # def line(x1, y1, x2, y2):
 #     if (backgroundSurf):
