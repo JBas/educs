@@ -1,8 +1,10 @@
 # from educs.pygame_wrapper import (setup, draw, createCanvas, line, ellipse, circle, rect, quad, arc, triangle, push, pop, getMouseX, getMouseY, getWidth, getHeight, cursor, strokeWeight, stroke, noStroke, loadImage, image, keyPressed, mouseClicked, mouseDragged, isMousedPressed, Image, frameRate, loop, noLoop)
 
-from educs.pyglet_wrapper import (setup, draw, State)
+from educs.pyglet_wrapper import (setup, draw, run)
 from educs.render import createCanvas
-from educs.shape import (circle, moveX, moveY, movePos)
+
+from educs.shape import (moveX, moveY, movePos)
+from educs.shape import (circle, point)
 
 # from educs.color import (color, alpha, background,
 #                          fill, noFill,

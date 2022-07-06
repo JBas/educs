@@ -51,3 +51,7 @@ def draw(func: function) -> function:
 
     return wrapper_draw
 
+def run():
+    pyglet.app.run()
+    return
+
