@@ -35,12 +35,6 @@ def setup(func: function) -> function:
 
     return on_enter
 
-@State.window.event
-def on_draw():
-    State.window.clear()
-    State.batch.draw()
-
-
 def draw(func: function) -> function:
 
     def wrapper_draw(dt):
