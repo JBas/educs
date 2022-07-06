@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import pyglet
-from window import Window
 
 # "private" variables
 width: int = 0
 height: int = 0
 framerate: int = 60
 batch: pyglet.graphics.Batch = pyglet.graphics.Batch()
-window: Window = Window(batch)
+window: pyglet.window.Window = pyglet.window.Window(batch)
 
 # RENDERING
 def createCanvas(w: int = 400, h: int = 400) -> None:
