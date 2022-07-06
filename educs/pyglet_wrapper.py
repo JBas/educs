@@ -2,24 +2,24 @@ from __future__ import annotations
 
 import pyglet
 
-# "private" variables
-width: int = 0
-height: int = 0
-framerate: int = 60
-batch: pyglet.graphics.Batch = pyglet.graphics.Batch()
-window: pyglet.window.Window = pyglet.window.Window(batch)
 
-# RENDERING
-def createCanvas(w: int = 400, h: int = 400) -> None:
-    global width
-    global height
-    global window
-    
-    width = w
-    height = h
-
-    window.set_size(w, h)
-    return
+class State:
+    # "private" variables
+    width: int = 0
+    height: int = 0
+    framerate: int = 60
+    batch: pyglet.graphics.Batch = pyglet.graphics.Batch()
+    batch_list = []
+    window: pyglet.window.Window = pyglet.window.Window()
+    settings_stack = []
+    settings = {
+        "fill_color": (255, 0, 255),
+        "no_fill": False,
+        "stroke_weight": 1,
+        "stroke_color": (0, 0, 0),
+        "rotate_deg": 0
+    }
+    pass
 
 
 # STRUCTURE
@@ -36,34 +36,10 @@ def setup(func: function) -> function:
 
 def draw(func: function) -> function:
 
-    @window.event
+    @State.window.event
     def on_draw():
         func()
         return
 
     return on_draw
-
-
-
-
-
-
-
-
-
-
-if __name__=="__main__":
-
-    @setup
-    def my_setup():
-        print("in setup")
-        createCanvas()
-        return
-
-    @draw
-    def my_draw():
-        print("in draw")
-        return
-
-    pyglet.app.run()
 
