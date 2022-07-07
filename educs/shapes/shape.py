@@ -26,8 +26,9 @@ def movePos(obj, position: tuple = None):
             print(f"This object {obj} has no member position!")
 
 
-def circle(x: float, y: float, d: float, border: int = 0, color: tuple = (255, 255, 255)) -> shapes.Circle :
-    shape = BorderableCircle(x, y, d/2, border, color=color, batch=State.batch)
+def circle(x: float, y: float, d: float, border: int = 0,
+           border_color: tuple[int] = (255, 255, 255), fill_color: tuple[int] = (255, 255, 255)) -> shapes.Circle :
+    shape = BorderableCircle(x, y, d/2, border=border, border_color=border_color, fill_color=fill_color, batch=State.batch)
     State.batch_list.append(shape)
     return shape
 
