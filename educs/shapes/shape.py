@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pyglet import shapes
 from educs.pyglet_wrapper import State
-from educs.shapes.shape_classes import BorderableCircle
+from educs.shapes.shape_classes import BorderableCircle, BorderableEllipse
 
 
 def moveX(obj, x: int = None):
@@ -29,6 +29,12 @@ def movePos(obj, position: tuple = None):
 def circle(x: float, y: float, d: float, border: int = 0,
            border_color: tuple[int] = (255, 255, 255), fill_color: tuple[int] = (255, 255, 255)) -> shapes.Circle :
     shape = BorderableCircle(x, y, d/2, border=border, border_color=border_color, fill_color=fill_color, batch=State.batch)
+    State.batch_list.append(shape)
+    return shape
+
+def ellipse(x: float, y: float, width: float, height: float, border: int = 0,
+           border_color: tuple[int] = (255, 255, 255), fill_color: tuple[int] = (255, 255, 255)) -> shapes.Circle :
+    shape = BorderableEllipse(x, y, width, height, border=border, border_color=border_color, fill_color=fill_color, batch=State.batch)
     State.batch_list.append(shape)
     return shape
 

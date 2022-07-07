@@ -5,7 +5,7 @@ from educs.render import createCanvas
 from educs.environment import (frameRate, frameCount)
 
 from educs.shapes import (moveX, moveY, movePos)
-from educs.shapes import (circle, point)
+from educs.shapes import (circle, point, ellipse)
 
 # from educs.color import (background, clear)
 
