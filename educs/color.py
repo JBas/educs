@@ -1,34 +1,83 @@
 from __future__ import annotations
+from educs.pyglet_wrapper import State
 from pyglet.gl.gl import glClearColor, GLfloat
 
 class Color:
 
     @staticmethod
+    # def _input2Tuple(color_data: int|str|tuple[int]) -> tuple[int]:
+    def _input2Tuple(*args) -> tuple[int]:
+
+        if len(args) == 4: # RGBA
+
+            r: int = args[0]
+            g: int = args[1]
+            b: int = args[2]
+            a: float = args[3]
+            return (r, g, b, a)
+
+        elif len(args) == 3: # RGB
+
+            r: int = args[0]
+            g: int = args[1]
+            b: int = args[2]
+            return (r, g, b)
+
+        elif len(args) == 1:
+
+            color_data = args[0]
+
+            if type(color_data) == int:
+
+                if color_data >= 0 and color_data <= 255:
+                    return (color_data, color_data, color_data)
+                else:
+                    return None
+
+            elif type(color_data) == str:
+
+                if color_data[0] == '#':
+
+                    if len(color_data[1:]) == 3:
+                        # 3 digit hex rgb notation
+                        r = int(color_data[1], 16)
+                        g = int(color_data[2], 16)
+                        b = int(color_data[3], 16)
+                        return (r, g, b)
+
+                    elif len(color_data[1:]) == 6:
+                        # 6 digit hex rgb notation
+                        r = int(color_data[1:3], 16)
+                        g = int(color_data[3:5], 16)
+                        b = int(color_data[5:7], 16)
+                        return (r, g, b)
+
+                    else:
+                        return None
+
+                else:
+                    # CSS color names
+                    pass
+
+            elif type(color_data) == tuple:
+
+                return color_data
+            else:
+                return None
+        
+        else:
+            return None
+
+    @staticmethod
     def _isValid(c: int) -> bool:
         return not (c < 0 or c > 255)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, color_data: int|str|tuple[int]):
 
         self._r: int = 255
         self._g: int = 255
         self._b: int = 255
-        self._a: int = 255
-
-        if type(args[0]) == tuple and len(args[0]) < 5:
-
-            rgb = args[0]
-            if Color._isValid(rgb[0]):
-                self._r = rgb[0]
-
-            if Color._isValid(rgb[1]):
-                self._g = rgb[1]
-
-            if Color._isValid(rgb[2]):
-                self._b = rgb[2]
-
-            if len(args[0]) == 4:
-             if Color._isValid(rgb[3]):
-                self._a = rgb[3]    
+        self._a: float = 1.0   
 
         return
     
@@ -85,8 +134,6 @@ class Color:
 
 
 
-
-
 def alpha(color: Color) -> int:
     return color.a
 
@@ -116,6 +163,15 @@ def background(color: tuple|Color) -> None:
     b: GLfloat = color[2] / 255
     glClearColor(r, g, b, 1.0)
     return
+
+def clear() -> None:
+    State.window.clear()
+    return
+
+def fill(color: tuple|Color) -> None:
+    State.settings["fill_color"] = _input2Color((r, g, b))
+    State.settings["no_fill"] = False
+    pass
 
 if __name__=="__main__":
     color_tuple = Color((255, 255, 255))

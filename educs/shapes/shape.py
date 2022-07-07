@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pyglet import shapes
 from educs.pyglet_wrapper import State
+from educs.shapes.shape_classes import BorderableCircle
 
 
 def moveX(obj, x: int = None):
@@ -25,17 +26,8 @@ def movePos(obj, position: tuple = None):
             print(f"This object {obj} has no member position!")
 
 
-
-
-
-class BorderableShape(shapes._ShapeBase):
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-
-def circle(x: float, y: float, d: float) -> shapes.Circle :
-    shape = shapes.Circle(x, y, d/2, color=(255, 255, 255), batch=State.batch)
+def circle(x: float, y: float, d: float, border: int = 0, color: tuple = (255, 255, 255)) -> shapes.Circle :
+    shape = BorderableCircle(x, y, d/2, border, color=color, batch=State.batch)
     State.batch_list.append(shape)
     return shape
 
