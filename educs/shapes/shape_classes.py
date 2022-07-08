@@ -1,10 +1,10 @@
 from __future__ import annotations
-from tkinter import MITER
-from turtle import width
 
 from pyglet import shapes, graphics, gl
 import numpy as np
 import math
+
+from educs import ROUND
 
 class _BorderableShapeBase:
     """Base class for Shape objects"""
@@ -27,6 +27,8 @@ class _BorderableShapeBase:
     _group = None
     _vertex_list_shape = None
     _vertex_list_border = None
+    _stroke_join = ROUND
+    _stroke_cap = ROUND
 
     def __del__(self):
         if self._vertex_list_shape is not None:
@@ -235,6 +237,7 @@ class BorderableCircle(_BorderableShapeBase):
     def __init__(self, x: float|int, y: float|int, radius: float|int, border: int = 1, segments: int = None,
                  fill_color: tuple[int, int, int] = (255, 255, 255),
                  border_color: tuple[int, int, int] = (0, 0, 0),
+                 stroke_join: int = ROUND, stroke_cap: int = ROUND, 
                  batch: graphics.Batch = None,
                  group: graphics.Group = None):
         self._rgb_fill = fill_color
@@ -250,6 +253,8 @@ class BorderableCircle(_BorderableShapeBase):
         self._anchor_y = 0
         self._radius = radius
         self._border = border
+        self._stroke_join = stroke_join
+        self._stroke_cap = stroke_cap
         self._batch = batch or graphics.Batch()
         self._group = shapes._ShapeGroup(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA, group)
         self._segments = segments or max(14, int(radius / 1.25))
@@ -347,6 +352,7 @@ class BorderableEllipse(_BorderableShapeBase):
                  border: int = 1, segments: int = None,
                  fill_color: tuple[int, int, int] = (255, 255, 255),
                  border_color: tuple[int, int, int] = (0, 0, 0),
+                 stroke_join: int = ROUND, stroke_cap: int = ROUND, 
                  batch: graphics.Batch = None,
                  group: graphics.Group = None):
         self._rgb_fill = fill_color
@@ -363,6 +369,8 @@ class BorderableEllipse(_BorderableShapeBase):
         self._anchor_x = 0
         self._anchor_y = 0
         self._border = border
+        self._stroke_join = stroke_join
+        self._stroke_cap = stroke_cap
         self._batch = batch
         self._group = shapes._ShapeGroup(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA, group)
         self._segments = segments or int(max(self._a, self._b) / 1.25)
@@ -471,6 +479,7 @@ class BorderableTriangle(_BorderableShapeBase):
                  border: int = 1,
                  fill_color: tuple[int, int, int] = (255, 255, 255),
                  border_color: tuple[int, int, int] = (0, 0, 0),
+                 stroke_join: int = ROUND, stroke_cap: int = ROUND, 
                  batch: graphics.Batch = None,
                  group: graphics.Group = None):
         self._rgb_fill = fill_color
@@ -487,6 +496,8 @@ class BorderableTriangle(_BorderableShapeBase):
         self._anchor_x = 0
         self._anchor_y = 0
         self._border = border
+        self._stroke_join = stroke_join
+        self._stroke_cap = stroke_cap
         self._batch = batch
         self._group = shapes._ShapeGroup(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA, group)
 
@@ -590,6 +601,7 @@ class BorderableQuadrilateral(_BorderableShapeBase):
                  border: int = 1,
                  fill_color: tuple[int, int, int] = (255, 255, 255),
                  border_color: tuple[int, int, int] = (0, 0, 0),
+                 stroke_join: int = ROUND, stroke_cap: int = ROUND, 
                  batch: graphics.Batch = None,
                  group: graphics.Group = None):
         self._rgb_fill = fill_color
@@ -608,6 +620,8 @@ class BorderableQuadrilateral(_BorderableShapeBase):
         self._anchor_x = 0
         self._anchor_y = 0
         self._border = border
+        self._stroke_join = stroke_join
+        self._stroke_cap = stroke_cap
         self._batch = batch
         self._group = shapes._ShapeGroup(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA, group)
 
@@ -710,6 +724,7 @@ class BorderableRectangle(BorderableQuadrilateral):
                  border: int = 1,
                  fill_color: tuple[int, int, int] = (255, 255, 255),
                  border_color: tuple[int, int, int] = (0, 0, 0),
+                 stroke_join: int = ROUND, stroke_cap: int = ROUND, 
                  batch: graphics.Batch = None,
                  group: graphics.Group = None):
 
@@ -725,4 +740,5 @@ class BorderableRectangle(BorderableQuadrilateral):
         # coordinate points are counter-clockwise
         super().__init__(x, y, x2, y2, x3, y3, x4, y4, border=border,
                          fill_color=fill_color, border_color=border_color,
+                         stroke_join=stroke_join, stroke_cap=stroke_cap,
                          batch=batch, group=group)

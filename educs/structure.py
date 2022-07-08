@@ -36,6 +36,9 @@ class State:
     ellipseModeConstant = ModeConstant.CENTER
     rectModeConstant = ModeConstant.CORNER
     wrapper_draw: function = None
+    wrapper_key_pressed: function = None
+    wrapper_key_released: function = None
+    wrapper_key_typed: function = None
     pass
 
 
@@ -48,7 +51,7 @@ def setup(func: function) -> function:
         func()
         return
 
-    return on_enter
+    return setup
 
 def draw(func: function) -> function:
 
