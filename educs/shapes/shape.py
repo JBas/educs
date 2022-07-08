@@ -1,7 +1,8 @@
 from __future__ import annotations
 from pyglet import shapes
 from educs.structure import State
-from educs.shapes.shape_classes import BorderableCircle, BorderableEllipse, BorderableTriangle, BorderableRectangle
+from educs.shapes.shape_classes import BorderableCircle, BorderableEllipse, BorderableTriangle, BorderableRectangle, BorderableQuadrilateral
+
 
 
 def moveX(obj, x: int = None):
@@ -64,7 +65,18 @@ def square(x: float, y: float,
          fill_color: tuple[int] = (255, 255, 255)) -> BorderableRectangle:
     shape = BorderableRectangle(x, y, size, size, border=border, border_color=border_color, fill_color=fill_color, batch=State.batch)
     State.batch_list.append(shape)   
-    return shape 
+    return shape
+
+def quad(x1: float, y1: float,
+         x2: float, y2: float,
+         x3: float, y3: float,
+         x4: float, y4: float,
+         border: int = 0,
+         border_color: tuple[int] = (255, 255, 255),
+         fill_color: tuple[int] = (255, 255, 255)) -> BorderableQuadrilateral:
+    shape = BorderableQuadrilateral(x1, y1, x2, y2, x3, y3, x4, y4, border=border, border_color=border_color, fill_color=fill_color, batch=State.batch)
+    State.batch_list.append(shape)   
+    return shape
 
 def point(x: float, y: float) -> BorderableCircle :
     shape = shapes.Circle(x, y, 1, color=(255, 255, 255), batch=State.batch)

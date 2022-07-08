@@ -2,7 +2,15 @@ from __future__ import annotations
 import time
 
 import pyglet
+from enum import Enum, auto
 
+class ModeConstant(Enum):
+    CENTER  = auto()
+    RADIUS  = auto()
+    CORNER  = auto()
+    CORNERS = auto()
+    DEGREES = auto()
+    RADIANS = auto()
 
 class State:
     # "private" variables
@@ -19,9 +27,10 @@ class State:
         "fill_color": (255, 0, 255),
         "no_fill": False,
         "stroke_weight": 1,
-        "stroke_color": (0, 0, 0),
-        "rotate_deg": 0
+        "stroke_color": (0, 0, 0)
     }
+    ellipseModeConstant = ModeConstant.CENTER
+    rectModeConstant = ModeConstant.CORNER
     wrapper_draw: function = None
     pass
 
