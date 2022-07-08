@@ -18,7 +18,9 @@ def noCursor() -> None:
     return
 
 def cursor(cursor_type: str, x: int = None, y: int = None) -> None:
-    State.windowset_mouse_cursor(cursor=cursor_type)
+    State.window.set_mouse_visible(False)
+
+    State.window.set_mouse_cursor(cursor=cursor_type)
     return
 
 def fullscreen(val: bool = None) -> bool:

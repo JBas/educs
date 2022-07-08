@@ -1,4 +1,5 @@
 from __future__ import annotations
+import time
 
 import pyglet
 
@@ -12,6 +13,7 @@ class State:
     batch: pyglet.graphics.Batch = pyglet.graphics.Batch()
     batch_list = []
     window: pyglet.window.Window = None
+    start_time = -1
     settings_stack = []
     settings = {
         "fill_color": (255, 0, 255),
@@ -28,6 +30,7 @@ def setup(func: function) -> function:
 
     @pyglet.app.event_loop.event
     def on_enter():
+        State.start_time = time.time_ns()*1000000 # nanoseconds to milliseconds
         # preload and any initialization
         func()
         return
