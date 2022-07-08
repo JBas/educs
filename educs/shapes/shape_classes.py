@@ -1,9 +1,10 @@
 from __future__ import annotations
+from tkinter import MITER
+from turtle import width
 
 from pyglet import shapes, graphics, gl
 import numpy as np
 import math
-
 
 class _BorderableShapeBase:
     """Base class for Shape objects"""
@@ -580,119 +581,6 @@ class BorderableTriangle(_BorderableShapeBase):
         self._vertex_list_border.draw(gl.GL_TRIANGLE_STRIP)
         self._group.unset_state_recursive()
 
-class BorderableRectangle(_BorderableShapeBase):
-
-    def __init__(self, x: float|int, y: float|int,
-                 width: float|int, height: float|int,
-                 border: int = 1,
-                 fill_color: tuple[int, int, int] = (255, 255, 255),
-                 border_color: tuple[int, int, int] = (0, 0, 0),
-                 batch: graphics.Batch = None,
-                 group: graphics.Group = None):
-        self._rgb_fill = fill_color
-        self._rgb_border = border_color
-        self._opacity_fill = 255
-        self._opacity_border = 255
-        self._visible = True
-        self._x = x
-        self._y = y
-        self._width = width
-        self._height = height
-        self._anchor_x = 0
-        self._anchor_y = 0
-        self._border = border
-        self._batch = batch
-        self._group = shapes._ShapeGroup(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA, group)
-
-        self._vertex_list_shape = None
-        self._vertex_list_border = None
-
-
-        # how many vertices will I need?
-        # N = 0
-        # if border:
-        #     N = 2*(self._segments+1)
-        #     tempv = [0, 0]*N
-        #     tempc = [border_color[0], border_color[1], border_color[2], self._opacity_border]*N
-        #     self._vertex_list_border = self._batch.add(N, gl.GL_TRIANGLE_STRIP, self._group,
-        #                                               ('v2f', tempv),
-        #                                               ('c4B', tempc))
-            
-        tempv = [0, 0]*6
-        tempc = [fill_color[0], fill_color[1], fill_color[2], self._opacity_fill]*6
-        self._vertex_list_shape = self._batch.add(6, gl.GL_TRIANGLES, self._group,
-                                                    ('v2f', tempv),
-                                                    ('c4B', tempc))
-
-        self._update_shape_position()
-        self._update_shape_color()
-
-    def _update_shape_position(self):
-        x1 = self._x + self._anchor_x
-        y1 = self._y + self._anchor_y
-        x2 = self._x + self._width + self._anchor_x
-        y2 = self._y + self._height + self._anchor_y
-
-        # if self._border:
-        #     a = a - self._border/2
-        #     b = b - self._border/2
-
-        points = [(x1, y1), (x1, y2), (x2, y2), (x1, y1), (x2, y1), (x2, y2)]
-
-        if self._rotation:
-            points = _BorderableShapeBase._rotate(points, self._rotation, self._x, self._y)
-
-        temp = np.array(points)
-        vertices = list(temp.flatten())
-
-        self._vertex_list_shape.vertices[:] = vertices
-
-    def _update_border_position(self):
-        x = self._x + self._anchor_x
-        y = self._y + self._anchor_y
-        a = self._a
-        b = self._b
-
-        bd = self._border
-        segment_arc_angle = math.pi*2 / self._segments
-
-        outer_points = [(x + (a+bd/2)*math.cos(i*segment_arc_angle),
-                   y + (b+bd/2)*math.sin(i*segment_arc_angle)) for i in range(self._segments)]
-
-        inner_points = [(x + (a-bd/2)*math.cos(i*segment_arc_angle),
-                   y + (b-bd/2)*math.sin(i*segment_arc_angle)) for i in range(self._segments)]
-
-        vertices = [None]*(2*self._segments)
-        vertices[::2] = outer_points
-        vertices[1::2] = inner_points
-
-        vertices.append(outer_points[0])
-        vertices.append(inner_points[0])
-
-        if self._rotation:
-            vertices = _BorderableShapeBase._rotate(vertices, self._rotation, self._x, self._y)
-
-        temp = np.array(vertices)
-        vertices = list(temp.flatten())
-
-        self._vertex_list_border.vertices[:] = vertices
-
-    def _update_border_color(self):
-        N = len(self._vertex_list_border.colors) // 4
-        colors = [self._rgb_border[0], self._rgb_border[1], self._rgb_border[2], int(self._opacity_border)]*N
-        self._vertex_list_border.colors[:] = colors
-
-    def _update_shape_color(self):
-        colors = [self._rgb_fill[0], self._rgb_fill[1], self._rgb_fill[2], int(self._opacity_fill)]*6
-        self._vertex_list_shape.colors[:] = colors
-
-
-    def draw(self):
-        self._group.set_state_recursive()
-        self._vertex_list_shape.draw(gl.GL_TRIANGLES)
-        # self._vertex_list_border.draw(gl.GL_TRIANGLE_STRIP)
-        self._group.unset_state_recursive()
-
 class BorderableQuadrilateral(_BorderableShapeBase):
 
     def __init__(self, x: float|int, y: float|int,
@@ -815,3 +703,26 @@ class BorderableQuadrilateral(_BorderableShapeBase):
         self._vertex_list_shape.draw(gl.GL_TRIANGLE_STRIP)
         # self._vertex_list_border.draw(gl.GL_TRIANGLE_STRIP)
         self._group.unset_state_recursive()
+
+class BorderableRectangle(BorderableQuadrilateral):
+    def __init__(self, x: float|int, y: float|int,
+                 width: float|int, height: float|int,
+                 border: int = 1,
+                 fill_color: tuple[int, int, int] = (255, 255, 255),
+                 border_color: tuple[int, int, int] = (0, 0, 0),
+                 batch: graphics.Batch = None,
+                 group: graphics.Group = None):
+
+        x2 = x
+        y2 = y + height
+        x3 = x + width
+        y3 = y + height
+        x4 = x + width
+        y4 = y
+        self._width = width
+        self._height = height
+
+        # coordinate points are counter-clockwise
+        super().__init__(x, y, x2, y2, x3, y3, x4, y4, border=border,
+                         fill_color=fill_color, border_color=border_color,
+                         batch=batch, group=group)

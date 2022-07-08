@@ -1,4 +1,10 @@
 
+ROUND   = 0
+MITER   = 1
+BEVEL   = 2
+SQUARE  = 3
+PROJECT = 4
+
 from educs.structure import (setup, draw, run, pop, push)
 from educs.render import createCanvas
 

@@ -4,6 +4,8 @@ import time
 import pyglet
 from enum import Enum, auto
 
+from educs import ROUND
+
 class ModeConstant(Enum):
     CENTER  = auto()
     RADIUS  = auto()
@@ -27,7 +29,9 @@ class State:
         "fill_color": (255, 0, 255),
         "no_fill": False,
         "stroke_weight": 1,
-        "stroke_color": (0, 0, 0)
+        "stroke_color": (0, 0, 0),
+        "stroke_join": ROUND,
+        "stroke_cap": ROUND
     }
     ellipseModeConstant = ModeConstant.CENTER
     rectModeConstant = ModeConstant.CORNER
