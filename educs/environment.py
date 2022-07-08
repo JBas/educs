@@ -1,5 +1,5 @@
 from __future__ import annotations
-from educs.pyglet_wrapper import State
+from educs.structure import State
 import pyglet
 
 def frameCount() -> int:
