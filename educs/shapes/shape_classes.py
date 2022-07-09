@@ -1,4 +1,5 @@
 from __future__ import annotations
+from locale import normalize
 
 from pyglet import shapes, graphics, gl
 import numpy as np
@@ -16,8 +17,8 @@ class _BorderableShapeBase:
     _opacity_border = 255
     _border = 0
     _visible = True
-    _x = 0
-    _y = 0
+    _x = None
+    _y = None
     _width = 0
     _height = 0
     _anchor_x = 0
@@ -29,6 +30,8 @@ class _BorderableShapeBase:
     _vertex_list_border = None
     _stroke_join = ROUND
     _stroke_cap = ROUND
+    _segments = 3
+    _border_n = 6*_segments
 
     def __del__(self):
         if self._vertex_list_shape is not None:
@@ -38,7 +41,61 @@ class _BorderableShapeBase:
             self._vertex_list_border.delete()
 
     def _update_border_position(self):
-        raise NotImplementedError
+
+        # https://stackoverflow.com/a/4889212
+        # for each segment:
+        #     calculate segment normal https://stackoverflow.com/a/7470098
+        #         1. direction = pt2 - pt1 = <x2-x1, y2-y1>
+        #         2. normal = flipp and negate left (since winding is clockwise) = <-(y2-y1), x2-x1>
+        #         2. divide by magnitude
+        #     scale to border width
+        #         1. unit vector * border
+        #     add scaled vector to p2 and p1 each to get p2x and p1x (border vertcies)
+
+        points = np.array([], dtype=tuple)
+
+        for i in range(self._segments):
+            y_i = self._y[i] + self._anchor_y
+            x_i = self._x[i] + self._anchor_x
+
+            if (i+1 >= self._segments):
+                y_i1 = self._y[0] + self._anchor_y
+                x_i1 = self._x[0] + self._anchor_x
+            else:
+                y_i1 = self._y[i+1] + self._anchor_y
+                x_i1 = self._x[i+1] + self._anchor_x
+
+            normal = np.array([-(y_i - y_i1), (x_i - x_i1)])
+
+            print(f"normal -> {normal}\n\n")
+            unit_normal = normal/np.linalg.norm(normal)
+            scaled = unit_normal*self._border
+
+            border_x_i = x_i + scaled[0]
+            border_y_i = y_i + scaled[1]
+
+            border_x_i1 = x_i1 + scaled[0]
+            border_y_i1 = y_i1 + scaled[1]
+
+            points = np.append(points, [
+                (border_x_i, border_y_i),
+                (border_x_i, border_y_i),
+                (x_i, y_i),
+                (border_x_i1, border_y_i1),
+                (x_i1, y_i1),
+                (x_i1, y_i1)
+            ])
+
+
+        if self._rotation:
+            points = np.array(_BorderableShapeBase._rotate(points, self._rotation, self._x[0] + self._anchor_x, self._y[0] + self._anchor_y))
+
+        vertices = list(points.flatten())
+
+        self._vertex_list_border.vertices[:] = vertices
+
+
+        # raise NotImplementedError
 
     def _update_shape_position(self):
         raise NotImplementedError
@@ -62,10 +119,12 @@ class _BorderableShapeBase:
             self._update_border_color()
 
     def draw(self):
-        self._group.set_state_recursive()  # type: ignore
-        self._vertex_list_shape.draw(gl.GL_TRIANGLES) # type: ignore
-        self._vertex_list_border.draw(gl.GL_TRIANGLES) # type: ignore
-        self._group.unset_state_recursive() # type: ignore
+        self._group.set_state_recursive()
+        self._vertex_list_shape.draw(gl.GL_TRIANGLES)
+
+        if self._border:
+            self._vertex_list_border.draw(gl.GL_TRIANGLE_STRIP)
+        self._group.unset_state_recursive()
 
     def delete(self):
         if self._vertex_list_shape is not None:
@@ -245,8 +304,9 @@ class BorderableCircle(_BorderableShapeBase):
         self._opacity_fill = 255
         self._opacity_border = 255
         self._visible = True
-        self._x = x
-        self._y = y
+        self._x = [x]
+        self._y = [y]
+
         self._width = 2*radius
         self._height = 2*radius
         self._anchor_x = 0
@@ -264,7 +324,6 @@ class BorderableCircle(_BorderableShapeBase):
 
 
         # how many vertices will I need?
-        N = 0
         if border:
             N = 2*(self._segments+1)
             tempv = [0, 0]*N
@@ -284,8 +343,8 @@ class BorderableCircle(_BorderableShapeBase):
         self._update_color()
 
     def _update_shape_position(self):
-        x = self._x + self._anchor_x
-        y = self._y + self._anchor_y
+        x = self._x[0] + self._anchor_x
+        y = self._y[0] + self._anchor_y
         r = self._radius
 
         if self._border:
@@ -304,8 +363,8 @@ class BorderableCircle(_BorderableShapeBase):
         self._vertex_list_shape.vertices[:] = vertices
 
     def _update_border_position(self):
-        x = self._x + self._anchor_x
-        y = self._y + self._anchor_y
+        x = self._x[0] + self._anchor_x
+        y = self._y[0] + self._anchor_y
         r = self._radius
 
         b = self._border
@@ -360,8 +419,8 @@ class BorderableEllipse(_BorderableShapeBase):
         self._opacity_fill = 255
         self._opacity_border = 255
         self._visible = True
-        self._x = x
-        self._y = y
+        self._x = [x]
+        self._y = [y]
         self._width = width
         self._height = height
         self._a = width / 2
@@ -380,7 +439,6 @@ class BorderableEllipse(_BorderableShapeBase):
 
 
         # how many vertices will I need?
-        N = 0
         if border:
             N = 2*(self._segments+1)
             tempv = [0, 0]*N
@@ -400,8 +458,8 @@ class BorderableEllipse(_BorderableShapeBase):
         self._update_color()
 
     def _update_shape_position(self):
-        x = self._x + self._anchor_x
-        y = self._y + self._anchor_y
+        x = self._x[0] + self._anchor_x
+        y = self._y[0] + self._anchor_y
         a = self._a
         b = self._b
 
@@ -415,7 +473,7 @@ class BorderableEllipse(_BorderableShapeBase):
                    y + b*math.sin(i*segment_arc_angle)) for i in range(self._segments)]
 
         if self._rotation:
-            points = _BorderableShapeBase._rotate(points, self._rotation, self._x, self._y)
+            points = _BorderableShapeBase._rotate(points, self._rotation, x, y)
 
         vertices = []
         for i, point in enumerate(points):
@@ -425,8 +483,8 @@ class BorderableEllipse(_BorderableShapeBase):
         self._vertex_list_shape.vertices[:] = vertices
 
     def _update_border_position(self):
-        x = self._x + self._anchor_x
-        y = self._y + self._anchor_y
+        x = self._x[0] + self._anchor_x
+        y = self._y[0] + self._anchor_y
         a = self._a
         b = self._b
 
@@ -447,7 +505,7 @@ class BorderableEllipse(_BorderableShapeBase):
         vertices.append(inner_points[0])
 
         if self._rotation:
-            vertices = _BorderableShapeBase._rotate(vertices, self._rotation, self._x, self._y)
+            vertices = _BorderableShapeBase._rotate(vertices, self._rotation, x, y)
 
         temp = np.array(vertices)
         vertices = list(temp.flatten())
@@ -487,18 +545,18 @@ class BorderableTriangle(_BorderableShapeBase):
         self._opacity_fill = 255
         self._opacity_border = 255
         self._visible = True
-        self._x = x1
-        self._y = y1
-        self._x2 = x2
-        self._y2 = y2
-        self._x3 = x3
-        self._y3 = y3
+
+        self._x = [x1, x2, x3]
+        self._y = [y1, y2, y3]
+
         self._anchor_x = 0
         self._anchor_y = 0
         self._border = border
         self._stroke_join = stroke_join
         self._stroke_cap = stroke_cap
         self._batch = batch
+        self._segments = 3
+        self._border_n = 6*self._segments
         self._group = shapes._ShapeGroup(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA, group)
 
         self._vertex_list_shape = None
@@ -506,14 +564,12 @@ class BorderableTriangle(_BorderableShapeBase):
 
 
         # how many vertices will I need?
-        # N = 0
-        # if border:
-        #     N = 2*(self._segments+1)
-        #     tempv = [0, 0]*N
-        #     tempc = [border_color[0], border_color[1], border_color[2], self._opacity_border]*N
-        #     self._vertex_list_border = self._batch.add(N, gl.GL_TRIANGLE_STRIP, self._group,
-        #                                               ('v2f', tempv),
-        #                                               ('c4B', tempc))
+        if border:
+            tempv = [0, 0]*self._border_n
+            tempc = [border_color[0], border_color[1], border_color[2], self._opacity_border]*self._border_n
+            self._vertex_list_border = self._batch.add(self._border_n, gl.GL_TRIANGLE_STRIP, self._group,
+                                                      ('v2f', tempv),
+                                                      ('c4B', tempc))
             
         tempv = [0, 0]*3
         tempc = [fill_color[0], fill_color[1], fill_color[2], self._opacity_fill]*3
@@ -521,16 +577,16 @@ class BorderableTriangle(_BorderableShapeBase):
                                                     ('v2f', tempv),
                                                     ('c4B', tempc))
 
-        self._update_shape_position()
-        self._update_shape_color()
+        self._update_position()
+        self._update_color()
 
     def _update_shape_position(self):
-        x1 = self._x + self._anchor_x
-        y1 = self._y + self._anchor_y
-        x2 = self._x2 + self._anchor_x
-        y2 = self._y2 + self._anchor_y
-        x3 = self._x3 + self._anchor_x
-        y3 = self._y3 + self._anchor_y
+        x1 = self._x[0] + self._anchor_x
+        y1 = self._y[0] + self._anchor_y
+        x2 = self._x[1] + self._anchor_x
+        y2 = self._y[1] + self._anchor_y
+        x3 = self._x[2] + self._anchor_x
+        y3 = self._y[2] + self._anchor_y
 
         # if self._border:
         #     a = a - self._border/2
@@ -539,62 +595,25 @@ class BorderableTriangle(_BorderableShapeBase):
         points = [(x1, y1), (x2, y2), (x3, y3)]
 
         if self._rotation:
-            points = _BorderableShapeBase._rotate(points, self._rotation, self._x, self._y)
+            points = _BorderableShapeBase._rotate(points, self._rotation, x1, y1)
 
         temp = np.array(points)
         vertices = list(temp.flatten())
 
         self._vertex_list_shape.vertices[:] = vertices
 
-    def _update_border_position(self):
-        x = self._x + self._anchor_x
-        y = self._y + self._anchor_y
-        a = self._a
-        b = self._b
-
-        bd = self._border
-        segment_arc_angle = math.pi*2 / self._segments
-
-        outer_points = [(x + (a+bd/2)*math.cos(i*segment_arc_angle),
-                   y + (b+bd/2)*math.sin(i*segment_arc_angle)) for i in range(self._segments)]
-
-        inner_points = [(x + (a-bd/2)*math.cos(i*segment_arc_angle),
-                   y + (b-bd/2)*math.sin(i*segment_arc_angle)) for i in range(self._segments)]
-
-        vertices = [None]*(2*self._segments)
-        vertices[::2] = outer_points
-        vertices[1::2] = inner_points
-
-        vertices.append(outer_points[0])
-        vertices.append(inner_points[0])
-
-        if self._rotation:
-            vertices = _BorderableShapeBase._rotate(vertices, self._rotation, self._x, self._y)
-
-        temp = np.array(vertices)
-        vertices = list(temp.flatten())
-
-        self._vertex_list_border.vertices[:] = vertices
 
     def _update_border_color(self):
-        N = len(self._vertex_list_border.colors) // 4
-        colors = [self._rgb_border[0], self._rgb_border[1], self._rgb_border[2], int(self._opacity_border)]*N
+        colors = [self._rgb_border[0], self._rgb_border[1], self._rgb_border[2], int(self._opacity_border)]*6*self._segments
         self._vertex_list_border.colors[:] = colors
 
     def _update_shape_color(self):
         colors = [self._rgb_fill[0], self._rgb_fill[1], self._rgb_fill[2], int(self._opacity_fill)]*3
         self._vertex_list_shape.colors[:] = colors
 
-
-    def draw(self):
-        self._group.set_state_recursive()
-        self._vertex_list_shape.draw(gl.GL_TRIANGLES)
-        self._vertex_list_border.draw(gl.GL_TRIANGLE_STRIP)
-        self._group.unset_state_recursive()
-
 class BorderableQuadrilateral(_BorderableShapeBase):
 
-    def __init__(self, x: float|int, y: float|int,
+    def __init__(self, x1: float|int, y1: float|int,
                  x2: float|int, y2: float|int,
                  x3: float|int, y3: float|int,
                  x4: float|int, y4: float|int,
@@ -609,20 +628,18 @@ class BorderableQuadrilateral(_BorderableShapeBase):
         self._opacity_fill = 255
         self._opacity_border = 255
         self._visible = True
-        self._x = x # coordinate points are counter-clockwise
-        self._y = y
-        self._x2 = x2
-        self._y2 = y2
-        self._x3 = x3
-        self._y3 = y3
-        self._x4 = x4
-        self._y4 = y4
+
+        # coordinate points are clockwise
+        self._x = [x1, x2, x3, x4]
+        self._y = [y1, y2, y3, y4]
+
         self._anchor_x = 0
         self._anchor_y = 0
         self._border = border
         self._stroke_join = stroke_join
         self._stroke_cap = stroke_cap
         self._batch = batch
+        self._segments = 4
         self._group = shapes._ShapeGroup(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA, group)
 
         self._vertex_list_shape = None
@@ -630,14 +647,12 @@ class BorderableQuadrilateral(_BorderableShapeBase):
 
 
         # how many vertices will I need?
-        # N = 0
-        # if border:
-        #     N = 2*(self._segments+1)
-        #     tempv = [0, 0]*N
-        #     tempc = [border_color[0], border_color[1], border_color[2], self._opacity_border]*N
-        #     self._vertex_list_border = self._batch.add(N, gl.GL_TRIANGLE_STRIP, self._group,
-        #                                               ('v2f', tempv),
-        #                                               ('c4B', tempc))
+        if border:
+            tempv = [0, 0]*10
+            tempc = [border_color[0], border_color[1], border_color[2], self._opacity_border]*10
+            self._vertex_list_border = self._batch.add(10, gl.GL_TRIANGLE_STRIP, self._group,
+                                                        ('v2f', tempv),
+                                                        ('c4B', tempc))
             
         tempv = [0, 0]*4
         tempc = [fill_color[0], fill_color[1], fill_color[2], self._opacity_fill]*4
@@ -645,18 +660,18 @@ class BorderableQuadrilateral(_BorderableShapeBase):
                                                     ('v2f', tempv),
                                                     ('c4B', tempc))
 
-        self._update_shape_position()
-        self._update_shape_color()
+        self._update_border_position()
+        self._update_color()
 
     def _update_shape_position(self):
-        x1 = self._x + self._anchor_x
-        y1 = self._y + self._anchor_y
-        x2 = self._x2 + self._anchor_x
-        y2 = self._y2 + self._anchor_y
-        x3 = self._x3 + self._anchor_x
-        y3 = self._y3 + self._anchor_y
-        x4 = self._x4 + self._anchor_x
-        y4 = self._y4 + self._anchor_y
+        x1 = self._x[0] + self._anchor_x
+        y1 = self._y[0] + self._anchor_y
+        x2 = self._x[1] + self._anchor_x
+        y2 = self._y[1] + self._anchor_y
+        x3 = self._x[2] + self._anchor_x
+        y3 = self._y[2] + self._anchor_y
+        x4 = self._x[3] + self._anchor_x
+        y4 = self._y[3] + self._anchor_y
 
         # if self._border:
         #     a = a - self._border/2
@@ -665,7 +680,7 @@ class BorderableQuadrilateral(_BorderableShapeBase):
         points = [(x1, y1), (x2, y2), (x4, y4), (x3, y3)]
 
         if self._rotation:
-            points = _BorderableShapeBase._rotate(points, self._rotation, self._x, self._y)
+            points = _BorderableShapeBase._rotate(points, self._rotation, x1, y1)
 
         temp = np.array(points)
         vertices = list(temp.flatten())
@@ -673,29 +688,30 @@ class BorderableQuadrilateral(_BorderableShapeBase):
         self._vertex_list_shape.vertices[:] = vertices
 
     def _update_border_position(self):
-        x = self._x + self._anchor_x
-        y = self._y + self._anchor_y
-        a = self._a
-        b = self._b
+        x1 = self._x[0] + self._anchor_x
+        y1 = self._y[0] + self._anchor_y
+        x2 = self._x[1] + self._anchor_x
+        y2 = self._y[1] + self._anchor_y
+        x3 = self._x[2] + self._anchor_x
+        y3 = self._y[2] + self._anchor_y
+        x4 = self._x[3] + self._anchor_x
+        y4 = self._y[3] + self._anchor_y
 
         bd = self._border
-        segment_arc_angle = math.pi*2 / self._segments
 
-        outer_points = [(x + (a+bd/2)*math.cos(i*segment_arc_angle),
-                   y + (b+bd/2)*math.sin(i*segment_arc_angle)) for i in range(self._segments)]
+        outer_points = [(x1-bd, y1-bd), (x2-bd, y2+bd), (x3+bd, y3+bd), (x4+bd, y4-bd)]
 
-        inner_points = [(x + (a-bd/2)*math.cos(i*segment_arc_angle),
-                   y + (b-bd/2)*math.sin(i*segment_arc_angle)) for i in range(self._segments)]
+        inner_points = [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
 
-        vertices = [None]*(2*self._segments)
+        outer_points.append(outer_points[0])
+        inner_points.append(inner_points[0])
+
+        vertices = [None]*10
         vertices[::2] = outer_points
         vertices[1::2] = inner_points
 
-        vertices.append(outer_points[0])
-        vertices.append(inner_points[0])
-
         if self._rotation:
-            vertices = _BorderableShapeBase._rotate(vertices, self._rotation, self._x, self._y)
+            vertices = _BorderableShapeBase._rotate(vertices, self._rotation, x1, y1)
 
         temp = np.array(vertices)
         vertices = list(temp.flatten())
@@ -703,8 +719,7 @@ class BorderableQuadrilateral(_BorderableShapeBase):
         self._vertex_list_border.vertices[:] = vertices
 
     def _update_border_color(self):
-        N = len(self._vertex_list_border.colors) // 4
-        colors = [self._rgb_border[0], self._rgb_border[1], self._rgb_border[2], int(self._opacity_border)]*N
+        colors = [self._rgb_border[0], self._rgb_border[1], self._rgb_border[2], int(self._opacity_border)]*10
         self._vertex_list_border.colors[:] = colors
 
     def _update_shape_color(self):
@@ -715,7 +730,7 @@ class BorderableQuadrilateral(_BorderableShapeBase):
     def draw(self):
         self._group.set_state_recursive()
         self._vertex_list_shape.draw(gl.GL_TRIANGLE_STRIP)
-        # self._vertex_list_border.draw(gl.GL_TRIANGLE_STRIP)
+        self._vertex_list_border.draw(gl.GL_TRIANGLE_STRIP)
         self._group.unset_state_recursive()
 
 class BorderableRectangle(BorderableQuadrilateral):
@@ -737,7 +752,7 @@ class BorderableRectangle(BorderableQuadrilateral):
         self._width = width
         self._height = height
 
-        # coordinate points are counter-clockwise
+        # coordinate points are clockwise
         super().__init__(x, y, x2, y2, x3, y3, x4, y4, border=border,
                          fill_color=fill_color, border_color=border_color,
                          stroke_join=stroke_join, stroke_cap=stroke_cap,
